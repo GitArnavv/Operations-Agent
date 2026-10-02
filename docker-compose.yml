@@ -1,0 +1,153 @@
+version: '3.8'
+
+services:
+  # ============================================================================
+  # 1. PostgreSQL 16 - Multi-Tenant Operational Store
+  # ============================================================================
+  postgres:
+    image: postgres:16-alpine
+    container_name: aiops-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-aiops_db}
+      POSTGRES_USER: ${POSTGRES_USER:-aiops_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-aiops_secure_password_2026}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-aiops_user} -d ${POSTGRES_DB:-aiops_db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - aiops-network
+
+  # ============================================================================
+  # 2. Redis 7 - Distributed Caching & Event Bus Broker
+  # ============================================================================
+  redis:
+    image: redis:7-alpine
+    container_name: aiops-redis
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "6379:6379"
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - aiops-network
+
+  # ============================================================================
+  # 3. MinIO - Local S3-Compatible Object Store for Document OCR & Invoices
+  # ============================================================================
+  minio:
+    image: minio/minio:RELEASE.2024-01-18T22-51-28Z
+    container_name: aiops-minio
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-aiops-minio-admin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-aiops-minio-secret-32chars}
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - miniodata:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+    networks:
+      - aiops-network
+
+  # ============================================================================
+  # 4. Spring Boot 3 Backend Service (Java 21 / Spring AI Gemini Flash)
+  # ============================================================================
+  backend:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.backend
+    container_name: aiops-backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-prod}
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-aiops_db}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-aiops_user}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-aiops_secure_password_2026}
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: 6379
+      APP_STORAGE_S3_ENDPOINT: http://minio:9000
+      APP_STORAGE_S3_BUCKET: aiops-documents
+      APP_STORAGE_S3_ACCESS_KEY: ${MINIO_ROOT_USER:-aiops-minio-admin}
+      APP_STORAGE_S3_SECRET_KEY: ${MINIO_ROOT_PASSWORD:-aiops-minio-secret-32chars}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-mock_gemini_api_key}
+      JWT_SECRET: ${JWT_SECRET:-c2VjdXJlLWVudGVycHJpc2UtYWlvcHMtaW5kaWEta2V5LTIwMjYtcHJvZHVjdGlvbi1zYWFzLWNoZWNrc3Vt}
+      JWT_EXPIRATION_MS: 86400000
+      PORT: 8080
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:8080/actuator/health || exit 1"]
+      interval: 20s
+      timeout: 5s
+      start_period: 40s
+      retries: 3
+    networks:
+      - aiops-network
+
+  # ============================================================================
+  # 5. React / Vite / Next.js Frontend Command Center
+  # ============================================================================
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.frontend
+    container_name: aiops-frontend
+    restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_healthy
+    environment:
+      VITE_API_BASE_URL: http://localhost:8080
+      VITE_SSE_STREAM_URL: http://localhost:8080/api/v1/telemetry/stream
+    ports:
+      - "80:80"
+      - "3000:80"
+    networks:
+      - aiops-network
+
+# ==============================================================================
+# Persistent Volumes & Network Topology
+# ==============================================================================
+volumes:
+  pgdata:
+    name: aiops_pgdata
+    driver: local
+  redisdata:
+    name: aiops_redisdata
+    driver: local
+  miniodata:
+    name: aiops_miniodata
+    driver: local
+
+networks:
+  aiops-network:
+    name: aiops_network
+    driver: bridge

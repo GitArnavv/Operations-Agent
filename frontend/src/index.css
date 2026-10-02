@@ -1,0 +1,360 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Global Z-Index Hierarchy */
+    --z-base: 0;
+    --z-sticky: 20;
+    --z-header: 30;
+    --z-sidebar: 40;
+    --z-dropdown: 100;
+    --z-popover: 200;
+    --z-command: 300;
+    --z-overlay: 400;
+    --z-modal: 500;
+    --z-toast: 600;
+    --z-tooltip: 700;
+
+    /* Global Layout Architecture Dimensions */
+    --sidebar-width: 240px;
+    --header-height: 56px;
+    --ai-panel-width: 400px;
+
+    /* Engineering Digest Cinematic Dark Atmosphere */
+    --background: #08070A;
+    --background-alt: #0B0A0D;
+    --surface: #111014;
+    --surface-raised: #141318;
+    --surface-subtle: #0D0C10;
+    --surface-hover: #18161D;
+    --surface-active: #201E26;
+    
+    /* Centralized Subtle Border Hierarchy - only when structural */
+    --border-subtle: rgba(255, 255, 255, 0.03);
+    --border: rgba(255, 255, 255, 0.05);
+    --border-strong: rgba(255, 255, 255, 0.09);
+    --border-hover: rgba(255, 100, 20, 0.35);
+    --border-focus: #FF5A00;
+
+    --foreground: #FFFFFF;
+    --muted: #0D0C10;
+    --muted-foreground: #8E8E96;
+    
+    /* Warm Saturated Orange */
+    --primary: #FF5A00;
+    --primary-foreground: #FFFFFF;
+    --primary-hover: #FF6A00;
+    --primary-subtle: #24140D;
+
+    --secondary: #141318;
+    --secondary-foreground: #A1A1AA;
+    --accent: #24140D;
+    --accent-foreground: #FF8533;
+
+    /* Semantic Status - Completely Solid */
+    --success: #10B981;
+    --warning: #F59E0B;
+    --danger: #EF4444;
+    --info: #3B82F6;
+    --focus: #FF5A00;
+
+    --status-success-bg: #0D2016;
+    --status-success-text: #34D399;
+    --status-success-border: #133D27;
+
+    --status-warning-bg: #261808;
+    --status-warning-text: #FBBF24;
+    --status-warning-border: #44290E;
+
+    --status-danger-bg: #261111;
+    --status-danger-text: #F87171;
+    --status-danger-border: #4A1C1C;
+
+    --status-info-bg: #0E1B2C;
+    --status-info-text: #60A5FA;
+    --status-info-border: #173254;
+
+    --overlay: rgba(0, 0, 0, 0.75);
+    --shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.35);
+    --shadow-elevated: 0 16px 40px -8px rgba(0, 0, 0, 0.65);
+
+    /* Coherent semantic chart colors */
+    --chart-1: #FF5A00;
+    --chart-2: #10B981;
+    --chart-3: #3B82F6;
+    --chart-4: #F59E0B;
+    --chart-5: #8B5CF6;
+
+    color-scheme: dark;
+  }
+
+  [data-theme="light"] {
+    /* Warm Off-White Editorial Light Surface Hierarchy */
+    --background: #F8F8F7;
+    --background-alt: #F1F1EE;
+    --surface: #FFFFFF;
+    --surface-raised: #FFFFFF;
+    --surface-subtle: #F4F4F1;
+    --surface-hover: #ECECE7;
+    --surface-active: #E4E4DC;
+
+    /* Centralized Opaque Border Hierarchy */
+    --border-subtle: #ECECE7;
+    --border: #E0E0D8;
+    --border-strong: #C4C4B9;
+    --border-hover: rgba(255, 90, 0, 0.5);
+    --border-focus: #FF5A00;
+
+    --foreground: #141318;
+    --muted: #F4F4F1;
+    --muted-foreground: #666461;
+
+    /* Warm Orange Primary */
+    --primary: #FF5A00;
+    --primary-foreground: #FFFFFF;
+    --primary-hover: #E04E00;
+    --primary-subtle: #FFF0E6;
+
+    --secondary: #F4F4F1;
+    --secondary-foreground: #141318;
+    --accent: #FFF0E6;
+    --accent-foreground: #C2410C;
+
+    /* Semantic Status - Completely Solid */
+    --success: #059669;
+    --warning: #D97706;
+    --danger: #DC2626;
+    --info: #2563EB;
+    --focus: #FF5A00;
+
+    --status-success-bg: #ECFDF5;
+    --status-success-text: #047857;
+    --status-success-border: #A7F3D0;
+
+    --status-warning-bg: #FFFBEB;
+    --status-warning-text: #B45309;
+    --status-warning-border: #FDE68A;
+
+    --status-danger-bg: #FEF2F2;
+    --status-danger-text: #B91C1C;
+    --status-danger-border: #FECACA;
+
+    --status-info-bg: #EFF6FF;
+    --status-info-text: #1D4ED8;
+    --status-info-border: #BFDBFE;
+
+    --overlay: rgba(0, 0, 0, 0.45);
+    --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.08);
+    --shadow-elevated: 0 12px 32px -4px rgba(0, 0, 0, 0.12);
+
+    /* Light mode chart colors */
+    --chart-1: #FF5A00;
+    --chart-2: #059669;
+    --chart-3: #2563EB;
+    --chart-4: #D97706;
+    --chart-5: #7C3AED;
+
+    color-scheme: light;
+  }
+
+  html,
+  body,
+  #root {
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    background-color: var(--background);
+    background-image: 
+      radial-gradient(ellipse at 50% -10%, rgba(140, 55, 15, 0.22), transparent 45%),
+      radial-gradient(circle at 85% 20%, rgba(100, 35, 10, 0.07), transparent 35%);
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    color: var(--foreground);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+
+  [data-theme="light"] body {
+    background-image: 
+      radial-gradient(ellipse at 50% -10%, rgba(255, 120, 30, 0.08), transparent 45%);
+  }
+}
+
+/* Typography tokens: Engineering Digest Editorial Scale */
+@layer utilities {
+  .display-hero {
+    font-size: clamp(2.25rem, 5vw, 4.25rem);
+    line-height: 1.08;
+    font-weight: 700;
+    letter-spacing: -0.035em;
+  }
+  .display-section {
+    font-size: clamp(1.6rem, 3.2vw, 2.5rem);
+    line-height: 1.15;
+    font-weight: 700;
+    letter-spacing: -0.025em;
+  }
+  .display-xl {
+    font-size: 2.5rem;
+    line-height: 1.15;
+    font-weight: 700;
+    letter-spacing: -0.025em;
+  }
+  .display-lg {
+    font-size: 2rem;
+    line-height: 1.2;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+  .heading-xl {
+    font-size: 1.5rem;
+    line-height: 1.25;
+    font-weight: 600;
+    letter-spacing: -0.015em;
+  }
+  .heading-lg {
+    font-size: 1.25rem;
+    line-height: 1.3;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .heading-md {
+    font-size: 1.05rem;
+    line-height: 1.35;
+    font-weight: 600;
+    letter-spacing: 0;
+  }
+  .body-lg {
+    font-size: 0.95rem;
+    line-height: 1.55;
+  }
+  .body-md {
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+  .body-sm {
+    font-size: 0.8125rem;
+    line-height: 1.45;
+  }
+  .mono {
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    letter-spacing: -0.01em;
+  }
+  .caption {
+    font-size: 0.6875rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+
+  /* Engineering Digest Orange Text Emphasis */
+  .text-orange-glow {
+    color: #FF5A00;
+    text-shadow: 0 0 20px rgba(255, 90, 0, 0.25);
+  }
+}
+
+/* Atmospheric Ambient Glow Layer for Section Heroes */
+.ambient-glow-hero {
+  background-image: radial-gradient(ellipse at 50% 0%, rgba(255, 90, 0, 0.16), transparent 60%);
+}
+
+.ambient-glow-section {
+  background-image: radial-gradient(ellipse at 50% 25%, rgba(140, 55, 15, 0.10), transparent 55%);
+}
+
+/* Solid Opaque Card with Engineering Digest Sophisticated Hover */
+.card-digest {
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  transition: transform 220ms cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 220ms cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 220ms cubic-bezier(0.16, 1, 0.3, 1),
+              background-color 220ms ease;
+}
+
+.card-digest:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255, 100, 20, 0.35);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.35), 0 0 24px rgba(255, 90, 0, 0.08);
+}
+
+/* Primary Button with Warm Orange Gradient and Micro-motion */
+.btn-primary-digest {
+  background: linear-gradient(135deg, #FF6500, #FF4D00);
+  color: #FFFFFF;
+  font-weight: 600;
+  border-radius: 9px;
+  box-shadow: 0 2px 10px rgba(255, 90, 0, 0.25);
+  transition: transform 160ms cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 160ms cubic-bezier(0.16, 1, 0.3, 1),
+              filter 160ms ease;
+}
+
+.btn-primary-digest:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 18px rgba(255, 90, 0, 0.38), 0 0 24px rgba(255, 90, 0, 0.16);
+  filter: brightness(1.05);
+}
+
+.btn-primary-digest:hover .btn-arrow-icon {
+  transform: translateX(3px);
+}
+
+.btn-primary-digest:active {
+  transform: translateY(0);
+}
+
+.btn-arrow-icon {
+  transition: transform 160ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Secondary Button with subtle border and orange hover border */
+.btn-secondary-digest {
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--foreground);
+  font-weight: 500;
+  border-radius: 9px;
+  transition: transform 160ms cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 160ms ease,
+              background-color 160ms ease;
+}
+
+.btn-secondary-digest:hover {
+  border-color: rgba(255, 100, 20, 0.35);
+  background-color: var(--surface-hover);
+  transform: translateY(-1px);
+}
+
+.btn-secondary-digest:active {
+  transform: translateY(0);
+}
+
+/* Smooth surface transition for theme switching without layout shifts */
+.theme-surface {
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: var(--background);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 4px;
+}

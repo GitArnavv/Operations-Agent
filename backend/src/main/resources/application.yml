@@ -1,0 +1,70 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /
+
+spring:
+  application:
+    name: ai-operations-agent
+  profiles:
+    active: dev
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+    default-property-inclusion: non_null
+
+jwt:
+  secret: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
+  expiration: 86400000 # 24 hours
+
+ai:
+  orchestrator:
+    max-steps: 12
+    default-model: "gpt-4o-enterprise"
+    confidence-threshold: 0.85
+  voice:
+    default-language: "en-IN"
+    supported-languages: ["en-IN", "hi-IN", "hinglish"]
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus,env,loggers
+      base-path: /actuator
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: when_authorized
+      roles: "ADMIN"
+      show-components: when_authorized
+      group:
+        readiness:
+          include: readinessState,db,diskSpace
+        liveness:
+          include: livenessState
+    metrics:
+      enabled: true
+    prometheus:
+      enabled: true
+  metrics:
+    tags:
+      application: ${spring.application.name:ai-operations-agent}
+    distribution:
+      percentiles-histogram:
+        aiops.gemini.flash.latency: true
+        http.server.requests: true
+      sla:
+        aiops.gemini.flash.latency: 500ms, 1000ms, 2000ms, 5000ms
+  tracing:
+    sampling:
+      probability: 1.0
+  observations:
+    key-values:
+      application: ${spring.application.name:ai-operations-agent}
+
+logging:
+  pattern:
+    level: "%5p [${spring.application.name:ai-operations-agent},%X{traceId:-},%X{spanId:-}]"
+
